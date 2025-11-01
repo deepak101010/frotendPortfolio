@@ -36,25 +36,40 @@ const Contact = () => {
         body: JSON.stringify(formData),
       });
 
-      const data = await response.json();
-      console.log('Response:', data);
-
+      // Check if response is ok before parsing JSON
       if (response.ok) {
-        setSubmitStatus('success');
-        setFormData({ name: '', email: '', message: '' });
+        try {
+          const data = await response.json();
+          console.log('Response:', data);
+          setSubmitStatus('success');
+          setFormData({ name: '', email: '', message: '' });
+        } catch (parseError) {
+          console.error('Error parsing response:', parseError);
+          setSubmitStatus('success'); // Still show success if response was ok
+          setFormData({ name: '', email: '', message: '' });
+        }
       } else {
-        // Show server error message if available
-        const errorMessage = data.message || 'Something went wrong. Please try again or contact me directly.';
-        setSubmitStatus('error');
-        console.error('Server error:', errorMessage);
+        // Handle error response
+        try {
+          const data = await response.json();
+          const errorMessage = data.message || `Server error: ${response.status} ${response.statusText}`;
+          setSubmitStatus('error');
+          console.error('Server error:', errorMessage);
+        } catch {
+          // Response is not JSON
+          setSubmitStatus('error');
+          console.error(`Server error: ${response.status} ${response.statusText}`);
+        }
       }
     } catch (error) {
       console.error('Error submitting form:', error);
       setSubmitStatus('error');
       
       // Check if it's a network error
-      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError'))) {
         console.error('Network error - Backend may be down or CORS issue');
+      } else {
+        console.error('Unexpected error:', error);
       }
     } finally {
       setIsSubmitting(false);
