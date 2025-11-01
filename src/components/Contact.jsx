@@ -1,13 +1,22 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { Mail, Phone, MapPin, Send, Github, Linkedin, CheckCircle, AlertCircle } from 'lucide-react';
-import { personalInfo } from '../data/portfolioData';
+import React, { useState } from "react";
+import { motion } from "framer-motion";
+import {
+  Mail,
+  Phone,
+  MapPin,
+  Send,
+  Github,
+  Linkedin,
+  CheckCircle,
+  AlertCircle,
+} from "lucide-react";
+import { personalInfo } from "../data/portfolioData";
 
 const Contact = () => {
   const [formData, setFormData] = useState({
-    name: '',
-    email: '',
-    message: ''
+    name: "",
+    email: "",
+    message: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
@@ -15,7 +24,7 @@ const Contact = () => {
   const handleChange = (e) => {
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
 
@@ -25,9 +34,9 @@ const Contact = () => {
     setSubmitStatus(null);
 
     try {
-      const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
-      console.log('Submitting to:', `${backendUrl}/api/contact`);
-      
+      const backendUrl =
+        import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+
       const response = await fetch(`${backendUrl}/api/contact`, {
         method: 'POST',
         headers: {
@@ -36,41 +45,17 @@ const Contact = () => {
         body: JSON.stringify(formData),
       });
 
-      // Check if response is ok before parsing JSON
       if (response.ok) {
-        try {
-          const data = await response.json();
-          console.log('Response:', data);
-          setSubmitStatus('success');
-          setFormData({ name: '', email: '', message: '' });
-        } catch (parseError) {
-          console.error('Error parsing response:', parseError);
-          setSubmitStatus('success'); // Still show success if response was ok
-          setFormData({ name: '', email: '', message: '' });
-        }
+        await response.json().catch(() => null); // Consume response
+        setSubmitStatus('success');
+        setFormData({ name: '', email: '', message: '' });
       } else {
-        // Handle error response
-        try {
-          const data = await response.json();
-          const errorMessage = data.message || `Server error: ${response.status} ${response.statusText}`;
-          setSubmitStatus('error');
-          console.error('Server error:', errorMessage);
-        } catch {
-          // Response is not JSON
-          setSubmitStatus('error');
-          console.error(`Server error: ${response.status} ${response.statusText}`);
-        }
+        await response.json().catch(() => null); // Consume response
+        setSubmitStatus('error');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
       setSubmitStatus('error');
-      
-      // Check if it's a network error
-      if (error.message && (error.message.includes('Failed to fetch') || error.message.includes('NetworkError'))) {
-        console.error('Network error - Backend may be down or CORS issue');
-      } else {
-        console.error('Unexpected error:', error);
-      }
     } finally {
       setIsSubmitting(false);
       setTimeout(() => setSubmitStatus(null), 5000);
@@ -81,22 +66,13 @@ const Contact = () => {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.2
-      }
-    }
+      transition: { staggerChildren: 0.2 },
+    },
   };
 
   const itemVariants = {
     hidden: { y: 30, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.8,
-        ease: "easeOut"
-      }
-    }
+    visible: { y: 0, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } },
   };
 
   return (
@@ -108,7 +84,7 @@ const Contact = () => {
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
         >
-          {/* Section Header */}
+          {/* Header */}
           <motion.div variants={itemVariants} className="text-center mb-16">
             <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-6">
               Get In <span className="gradient-text">Touch</span>
@@ -127,19 +103,20 @@ const Contact = () => {
                   Let's Connect
                 </h3>
 
-                {/* Contact Details */}
                 <div className="space-y-6">
-                  <motion.div 
+                  {/* Email */}
+                  <motion.div
                     className="flex items-center space-x-4 p-4 bg-primary-50 rounded-lg"
                     whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
                   >
                     <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center">
                       <Mail className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-900">Email</h4>
-                      <a 
+                      <h4 className="text-lg font-semibold text-gray-900">
+                        Email
+                      </h4>
+                      <a
                         href={`mailto:${personalInfo.email}`}
                         className="text-primary-600 hover:text-primary-700 transition-colors"
                       >
@@ -148,17 +125,19 @@ const Contact = () => {
                     </div>
                   </motion.div>
 
-                  <motion.div 
+                  {/* Phone */}
+                  <motion.div
                     className="flex items-center space-x-4 p-4 bg-primary-50 rounded-lg"
                     whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
                   >
                     <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center">
                       <Phone className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-900">Phone</h4>
-                      <a 
+                      <h4 className="text-lg font-semibold text-gray-900">
+                        Phone
+                      </h4>
+                      <a
                         href={`tel:${personalInfo.phone}`}
                         className="text-primary-600 hover:text-primary-700 transition-colors"
                       >
@@ -167,16 +146,18 @@ const Contact = () => {
                     </div>
                   </motion.div>
 
-                  <motion.div 
+                  {/* Location */}
+                  <motion.div
                     className="flex items-center space-x-4 p-4 bg-primary-50 rounded-lg"
                     whileHover={{ scale: 1.02 }}
-                    transition={{ duration: 0.2 }}
                   >
                     <div className="w-12 h-12 bg-primary-600 rounded-full flex items-center justify-center">
                       <MapPin className="w-6 h-6 text-white" />
                     </div>
                     <div>
-                      <h4 className="text-lg font-semibold text-gray-900">Location</h4>
+                      <h4 className="text-lg font-semibold text-gray-900">
+                        Location
+                      </h4>
                       <p className="text-gray-600">{personalInfo.location}</p>
                     </div>
                   </motion.div>
@@ -184,7 +165,9 @@ const Contact = () => {
 
                 {/* Social Links */}
                 <div className="mt-8 pt-8 border-t border-gray-200">
-                  <h4 className="text-lg font-semibold text-gray-900 mb-4">Follow Me</h4>
+                  <h4 className="text-lg font-semibold text-gray-900 mb-4">
+                    Follow Me
+                  </h4>
                   <div className="flex space-x-4">
                     <motion.a
                       href={personalInfo.github}
@@ -220,7 +203,10 @@ const Contact = () => {
 
                 <form onSubmit={handleSubmit} className="space-y-6">
                   <div>
-                    <label htmlFor="name" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="name"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Your Name
                     </label>
                     <input
@@ -236,7 +222,10 @@ const Contact = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="email"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Your Email
                     </label>
                     <input
@@ -252,7 +241,10 @@ const Contact = () => {
                   </div>
 
                   <div>
-                    <label htmlFor="message" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label
+                      htmlFor="message"
+                      className="block text-sm font-medium text-gray-700 mb-2"
+                    >
                       Your Message
                     </label>
                     <textarea
@@ -288,26 +280,30 @@ const Contact = () => {
                     )}
                   </motion.button>
 
-                  {/* Status Messages */}
-                  {submitStatus === 'success' && (
+                  {submitStatus === "success" && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="flex items-center space-x-2 text-green-600 bg-green-50 p-4 rounded-lg"
                     >
                       <CheckCircle size={20} />
-                      <span>Message sent successfully! I'll get back to you soon.</span>
+                      <span>
+                        Message sent successfully! I'll get back to you soon.
+                      </span>
                     </motion.div>
                   )}
 
-                  {submitStatus === 'error' && (
+                  {submitStatus === "error" && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
                       className="flex items-center space-x-2 text-red-600 bg-red-50 p-4 rounded-lg"
                     >
                       <AlertCircle size={20} />
-                      <span>Something went wrong. Please try again or contact me directly.</span>
+                      <span>
+                        Something went wrong. Please try again or contact me
+                        directly.
+                      </span>
                     </motion.div>
                   )}
                 </form>
