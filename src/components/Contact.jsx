@@ -37,6 +37,8 @@ const Contact = () => {
       const backendUrl =
         import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
 
+      console.log('Submitting to:', `${backendUrl}/api/contact`);
+
       const response = await fetch(`${backendUrl}/api/contact`, {
         method: 'POST',
         headers: {
@@ -45,16 +47,26 @@ const Contact = () => {
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json().catch(() => ({}));
+
       if (response.ok) {
-        await response.json().catch(() => null); // Consume response
         setSubmitStatus('success');
         setFormData({ name: '', email: '', message: '' });
       } else {
-        await response.json().catch(() => null); // Consume response
+        console.error('Contact form error:', {
+          status: response.status,
+          statusText: response.statusText,
+          data: data
+        });
         setSubmitStatus('error');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
       setSubmitStatus('error');
     } finally {
       setIsSubmitting(false);
