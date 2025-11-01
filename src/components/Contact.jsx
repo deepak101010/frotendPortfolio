@@ -26,6 +26,8 @@ const Contact = () => {
 
     try {
       const backendUrl = import.meta.env.VITE_BACKEND_URL || 'http://localhost:5000';
+      console.log('Submitting to:', `${backendUrl}/api/contact`);
+      
       const response = await fetch(`${backendUrl}/api/contact`, {
         method: 'POST',
         headers: {
@@ -34,15 +36,26 @@ const Contact = () => {
         body: JSON.stringify(formData),
       });
 
+      const data = await response.json();
+      console.log('Response:', data);
+
       if (response.ok) {
         setSubmitStatus('success');
         setFormData({ name: '', email: '', message: '' });
       } else {
+        // Show server error message if available
+        const errorMessage = data.message || 'Something went wrong. Please try again or contact me directly.';
         setSubmitStatus('error');
+        console.error('Server error:', errorMessage);
       }
     } catch (error) {
       console.error('Error submitting form:', error);
       setSubmitStatus('error');
+      
+      // Check if it's a network error
+      if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+        console.error('Network error - Backend may be down or CORS issue');
+      }
     } finally {
       setIsSubmitting(false);
       setTimeout(() => setSubmitStatus(null), 5000);
