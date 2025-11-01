@@ -134,6 +134,12 @@ export const projects = [
 
 export const certifications = [
   {
+    title: "React JS",
+    issuer: "Infosys Springboard",
+    date: "2025",
+    description: "Comprehensive certification covering React fundamentals, Hooks, state management with Redux and Context API, React Router, performance optimization, and modern best practices for building scalable web applications."
+  },
+  {
     title: "Frontend Developer",
     issuer: "Goldenmace IT Solutions",
     date: "2024",
